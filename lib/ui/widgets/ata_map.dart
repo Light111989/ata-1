@@ -6,7 +6,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as maps;
-import 'dart:math' as math;
 
 /// A custom Flutter Google Map.
 /// Have some features:
@@ -78,8 +77,7 @@ class AtaMapState extends State<AtaMap> {
   }
 
   void _setCustomMapIcons() async {
-    markedLocationIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(128, 128)), 'assets/images/marked-location-icon.png');
+    markedLocationIcon = await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(128, 128)), 'assets/images/marked-location-icon.png');
   }
 
   Future<Position> _getCurrentLocation() async => await Geolocator().getCurrentPosition();
@@ -134,8 +132,7 @@ class AtaMapState extends State<AtaMap> {
             markerId: MarkerId(point.toString()),
             position: point,
             infoWindow: InfoWindow(
-                title:
-                    widget.isMoveableMarker ? '$currentMarkedLat, $currentMarkedLng' : '${widget.titleMarkedPosition}',
+                title: widget.isMoveableMarker ? '$currentMarkedLat, $currentMarkedLng' : '${widget.titleMarkedPosition}',
                 snippet: 'Distance to Office :${_calcDistance()} m'),
             icon: markedLocationIcon,
             draggable: widget.isMoveableMarker,
@@ -194,9 +191,9 @@ class AtaMapState extends State<AtaMap> {
           markers: _markers,
           circles: _circles,
           onLongPress: _handleLongPress),
-      floatingActionButtonLocation: _CenterDockedFloatingActionButtonLocation(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 47.0),
+        padding: const EdgeInsets.only(top: 48.0, right: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
@@ -228,34 +225,5 @@ class AtaMapState extends State<AtaMap> {
         ),
       ),
     );
-  }
-}
-
-class _CenterDockedFloatingActionButtonLocation extends _DockedFloatingActionButtonLocation {
-  const _CenterDockedFloatingActionButtonLocation();
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final double fabX = (scaffoldGeometry.scaffoldSize.width - scaffoldGeometry.floatingActionButtonSize.width) / 2.0;
-    return Offset(fabX, getDockedY(scaffoldGeometry));
-  }
-}
-
-abstract class _DockedFloatingActionButtonLocation extends FloatingActionButtonLocation {
-  const _DockedFloatingActionButtonLocation();
-  @protected
-  double getDockedY(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final double contentBottom = scaffoldGeometry.contentTop;
-    final double appBarHeight = scaffoldGeometry.bottomSheetSize.height;
-    final double fabHeight = scaffoldGeometry.floatingActionButtonSize.height;
-    final double snackBarHeight = scaffoldGeometry.snackBarSize.height;
-
-    double fabY = contentBottom - fabHeight / 2.0;
-    if (snackBarHeight > 0.0)
-      fabY = math.min(fabY, contentBottom - snackBarHeight - fabHeight - kFloatingActionButtonMargin);
-    if (appBarHeight > 0.0) fabY = math.min(fabY, contentBottom - appBarHeight - fabHeight / 2.0);
-
-    final double maxFabY = scaffoldGeometry.scaffoldSize.height - fabHeight;
-    return math.min(maxFabY, fabY);
   }
 }
