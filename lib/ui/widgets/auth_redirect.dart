@@ -9,17 +9,14 @@ class AuthRedirect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
-    if (authService.isAuth)
-      return HomeScreen();
-    else
-      return FutureBuilder(
-        future: authService.autoSignIn(),
-        builder: (ctx, AsyncSnapshot<bool> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return LoadingScreen();
-          else
-            return snapshot.data ? HomeScreen() : LoginScreen();
-        },
-      );
+    return FutureBuilder(
+      future: authService.autoSignIn(),
+      builder: (ctx, AsyncSnapshot<bool> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return LoadingScreen();
+        else
+          return snapshot.data ? HomeScreen() : LoginScreen();
+      },
+    );
   }
 }

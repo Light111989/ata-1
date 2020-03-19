@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   List<Map<String, Object>> _tabs;
   final List<Widget> _screens = [
     CheckInScreen(),
@@ -45,12 +45,31 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ];
     _pageController = new PageController();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     super.dispose();
     _pageController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.resumed:
+        bool isExpiredToken = await Provider.of<AuthService>(context, listen: false).autoSignIn();
+        if (!isExpiredToken) Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 
   //Animates the controlled [PageView] from the current page to the given page.
